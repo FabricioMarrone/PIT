@@ -21,7 +21,7 @@ public class Item extends GameObject{
 	
 	private float takedAnimTime= 0.5f;
 	private float elapsedTakedAnimTime;
-	private int takedAnimOffset;
+	protected int takedAnimOffset;
 	private boolean recentlyTaked= false;
 	
 	public Item(int tilePosX, int tilePosY) {
@@ -35,7 +35,6 @@ public class Item extends GameObject{
 		if(getCurrentState() == States.DISCOVERED || recentlyTaked){
 			batch.draw(getTexture(), getPosition().x, getPosition().y + takedAnimOffset);
 		}
-		
 	}
 
 	@Override
@@ -53,13 +52,12 @@ public class Item extends GameObject{
 				recentlyTaked= false;
 			}
 		}
-		
 	}
 
 	/**
 	 * This method is called when the item is taken.
 	 */
-	public void itemTaked(Player player){
+	public void itemTaken(Player player){
 		//This method should be override to add behavior. Dont forget to call super.
 		player.addScore(value);
 		

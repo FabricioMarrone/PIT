@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.tomgames.basic.ScreenClass;
 import com.tomgames.basic.gui.Component;
 import com.tomgames.basic.resources.Assets;
+import com.tomgames.pit.entities.BadPirate;
 import com.tomgames.pit.entities.Entity;
 import com.tomgames.pit.entities.Player;
 import com.tomgames.pit.entities.Raft;
@@ -24,15 +25,17 @@ public class Gameplay extends ScreenClass{
 	ShapeRenderer shapeRender;
 	private GameCamera camera;
 	
-	private Island currentIsland, island, islandE, islandN;
+	private Island currentIsland;
+	private Island m1, m2, m3, m4, m5, m6, m7, m8, m9;
+	
 	public ShootSystem shootSystem;
 	
 	public Player player;
 	Raft raft;
 	
 	float x, y;
-	int mapTileSizeX= 80;
-	int mapTileSizeY= 40;
+	int mapTileSizeX= 100;
+	int mapTileSizeY= 100;
 	
 	public Gameplay() {
 		//ESTO DEBE HACERCE EN LOADING SCREEN
@@ -44,11 +47,16 @@ public class Gameplay extends ScreenClass{
 		batchGUI = new SpriteBatch();
 		shapeRender= new ShapeRenderer();
 		
+		init();
+      
+	}
+	
+	public void init(){
 		shootSystem= new ShootSystem();
-		
+
 		//tiledMap = new TmxMapLoader().load("maps/testMap.tmx");
-        //tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-        //TiledMapAnimator.loadAnimatedTiles(tiledMap);
+		//tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+		//TiledMapAnimator.loadAnimatedTiles(tiledMap);
 		/*
         MapProperties prop = tiledMap.getProperties();
         int mapWidth = prop.get("width", Integer.class);
@@ -57,26 +65,39 @@ public class Gameplay extends ScreenClass{
         int tilePixelHeight = prop.get("tileheight", Integer.class);
         mapPixelWidth = mapWidth * tilePixelWidth;
         mapPixelHeight = mapHeight * tilePixelHeight;
-        */
+		 */
+
+		m1= new Island("m1");
+		m2= new Island("m2");
+		m3= new Island("m3");
+		m4= new Island("m4");
+		m5= new Island("m5");
+		m6= new Island("m6");
+		m7= new Island("m7");
+		m8= new Island("m8");
+		m9= new Island("m9");
 		
-        island= new Island("testMap.tmx");
-        islandE= new Island("testMapE.tmx");
-        islandN= new Island("testMapN.tmx");
-        
-        island.setNeighborhoodIslands(islandN, null, islandE, null);
-        islandE.setNeighborhoodIslands(null, null, null, island);
-        islandN.setNeighborhoodIslands(null, island, null, null);
-        
-        changeToIsland(island);
-        
-        player= new Player(54 * 32, 8 *32);
-        player.setLifePoints(90);
-        player.setAmmo(15);
-        player.setCurrentAttackMode(Entity.AttackMode.RANGED);
-        raft= new Raft(54 * 32, 7 * 32);
-        
-        camera.follow(player);
+		m1.setNeighborhoodIslands(null, m4, m2, null);
+		m2.setNeighborhoodIslands(null, m5, m3, m1);
+		m3.setNeighborhoodIslands(null, m6, null, m2);
+		m4.setNeighborhoodIslands(m1, m7, m5, null);
+		m5.setNeighborhoodIslands(m2, m8, m6, m4);
+		m6.setNeighborhoodIslands(m3, m9, null, m5);
+		m7.setNeighborhoodIslands(m4, null, m8, null);
+		m8.setNeighborhoodIslands(m5, null, m9, m7);
+		m9.setNeighborhoodIslands(m6, null, null, m8);
+
+		changeToIsland(m5);
+
+		player= new Player(46 * 32, 56 *32);
+		player.setLifePoints(90);
+		player.setAmmo(15);
+		player.setCurrentAttackMode(Entity.AttackMode.RANGED);
+		raft= new Raft(46 * 32, 62 * 32);
+
+		camera.follow(player);
 	}
+	
 	
 	@Override
 	public void render(float delta) {
@@ -93,8 +114,8 @@ public class Gameplay extends ScreenClass{
 		batch.begin();
 		currentIsland.renderItems(batch);
 		raft.render(batch, shapeRender);
-		player.render(batch, shapeRender);
 		currentIsland.renderEnemies(batch);
+		player.render(batch, shapeRender);
 		shootSystem.render(batch, shapeRender);
 		batch.end();
 		
@@ -102,6 +123,7 @@ public class Gameplay extends ScreenClass{
 		
 		batch.begin();
 		currentIsland.renderRecentlyTakedItems(batch);
+		player.renderTalk(batch);
 		batch.end();
 		
 		//render gui
@@ -156,6 +178,7 @@ public class Gameplay extends ScreenClass{
 		CollisionSystem.checkForEntityCollision(player, currentIsland.getDestructibleBlocks());
 		
 		if(Gdx.input.isKeyJustPressed(Keys.SPACE)) player.dig();
+		if(Gdx.input.isKeyJustPressed(Keys.L)) init();
 		
 		camera.update(delta);
 		

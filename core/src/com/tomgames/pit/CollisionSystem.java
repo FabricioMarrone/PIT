@@ -8,8 +8,11 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.tomgames.pit.entities.Enemy;
 import com.tomgames.pit.entities.Entity;
 import com.tomgames.pit.entities.Player;
+import com.tomgames.pit.entities.Totem;
 import com.tomgames.pit.entities.shoots.Shoot;
 
 public class CollisionSystem {
@@ -77,6 +80,19 @@ public class CollisionSystem {
 		cells= blocksCloseToEntity;
 	}
 	
+	public static void checkFor_PlayerEnemy_Collision(Player player, ArrayList<Enemy> enemies){
+		for(int i= 0; i < enemies.size(); i++){
+			//JUST TOTEMS FOR THE MOMENT (static enemies)
+			if(enemies.get(i) instanceof Totem){
+				if(enemies.get(i).getCurrentState() != Entity.States.DEAD){
+					if(enemies.get(i).getZone().overlaps(player.getZone())){
+						manageCollision(enemies.get(i).getZone(), player);
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Checks whenever an alive shoot collides a "normal block" and "destructible ones".
 	 * @param shoot
@@ -109,6 +125,24 @@ public class CollisionSystem {
 	}
 	
 	/**
+	 * Check if the shoot hits on an alive enemy.
+	 * @param enemies
+	 * @param shoot
+	 */
+	public static void checkForShootCollision(ArrayList<Enemy> enemies, Shoot shoot){
+		if(shoot.getCurrentState() == Shoot.State.DEAD) return;
+		
+		for(int i=0; i < enemies.size(); i++){
+			if(enemies.get(i).getZone().overlaps(shoot.getZone())){
+				if(enemies.get(i).getCurrentState() != Entity.States.DEAD){
+					shoot.setCurrentState(Shoot.State.DEAD);
+					enemies.get(i).applyDamage(15);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Manages the positive entity collision with a "block".
 	 * @param rectTile
 	 * @param entity
@@ -134,7 +168,7 @@ public class CollisionSystem {
 			entity.setPosition(entity.getPosition().x, rectTile.y - entity.getZone().height);
 			entity.setVelY(0);
 		}
-		System.out.println("entro a manage collision");
+		//System.out.println("entro a manage collision");
 	}
 
 	/**
@@ -145,7 +179,14 @@ public class CollisionSystem {
 	 */
 	public static void checkForHit(Rectangle swordArea, ArrayList<DestructibleBlock> destructibleBloks){
 		//check for hitting an enemy
-		//TODO
+		ArrayList<Enemy> enemies= PIT.instance.gameplay.getCurrentIsland().getEnemies();
+		for(int i= 0; i < enemies.size(); i++){
+			if(enemies.get(i).getCurrentState() != Entity.States.DEAD){
+				if(enemies.get(i).getZone().overlaps(swordArea)){
+					enemies.get(i).applyDamage(3);
+				}
+			}
+		}
 		
 		//check for hitting a destructible block (that are alive)
 		for(int i= 0; i < destructibleBloks.size(); i++){

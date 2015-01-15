@@ -350,4 +350,47 @@ public abstract class Entity extends GameObject{
 		
 		return null;
 	}
+	
+	/**
+	 * Given 2 points (A and B), this method returns the direction (aprox) to join with a "line" the point A (x1,y1) with B (x2,y2)
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return
+	 */
+	public static Directions getDirection(int x1, int y1, int x2, int y2){
+		//check up and down
+		if(x1==x2){
+			//check N
+			if(y1<=y2) return Directions.N;
+			//check S
+			if(y1>=y2) return Directions.S;
+		}
+		//check left and rigth
+		if(y1==y2){
+			//check left
+			if(x1<=x2) return Directions.E;
+			//check rigth
+			if(x1>=x2) return Directions.W;
+		}
+		//check NS
+		for(int i= 0; i < 10; i++){
+			if((x1==(x2-i)) && (y1==(y2-i))) return Directions.NE;
+		}
+		//check WS
+		for(int i= 0; i < 10; i++){
+			if((x1==(x2+i)) && (y1==(y2+i))) return Directions.SW;
+		}
+		//check NW
+		for(int i= 0; i < 10; i++){
+			if((x1==(x2+i)) && (y1==(y2-i))) return Directions.NW;
+		}
+		//check SE
+		for(int i= 0; i < 10; i++){
+			if((x1==(x2-i)) && (y1==(y2+i))) return Directions.SE;
+		}
+		
+		return null;
+	}
 }//end class

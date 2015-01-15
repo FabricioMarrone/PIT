@@ -17,8 +17,8 @@ public class AmmoItem extends Item{
 	
 	
 	@Override
-	public void itemTaked(Player player) {
-		super.itemTaked(player);
+	public void itemTaken(Player player) {
+		super.itemTaken(player);
 		player.addAmmo(cantAmmo);
 	}
 

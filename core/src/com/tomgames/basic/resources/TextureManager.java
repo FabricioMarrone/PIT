@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TextureManager {
 
-	public TextureRegion testTex, pirate, coin, ammo, health, raft, raftalone, arrow, shoot, sword, fireball, totem;
+	public TextureRegion testTex, pirate, coin, coin2, ammo, health, health2, raft, raftalone, arrow, shoot, sword, fireball, totem, 
+	badPirate, deadbadpirate, bigTreasure, clue;
 	
 	private Texture pirateSprites;
 	public TextureRegion pirateW, pirateE, pirateN, pirateS, pirateSW, pirateSE, pirateNW, pirateNE, dead;
@@ -16,13 +17,19 @@ public class TextureManager {
 		raft= new TextureRegion(new Texture("images/player/raft.png"));
 		raftalone= new TextureRegion(new Texture("images/player/raftalone.png"));
 		coin= new TextureRegion(new Texture("images/coin.png"));
+		coin2= new TextureRegion(new Texture("images/coin2.png"));
+		bigTreasure= new TextureRegion(new Texture("images/bigtreasure.png"));
 		ammo= new TextureRegion(new Texture("images/ammo.png"));
 		health= new TextureRegion(new Texture("images/health.png"));
+		health2= new TextureRegion(new Texture("images/health2.png"));
 		arrow= new TextureRegion(new Texture("images/arrow.png"));
 		shoot= new TextureRegion(new Texture("images/shoot.png"));
 		sword= new TextureRegion(new Texture("images/sword.png"));
 		fireball= new TextureRegion(new Texture("images/fireball.png"));
 		totem= new TextureRegion(new Texture("images/totem.png"));
+		badPirate= new TextureRegion(new Texture("images/badpirate.png"));
+		deadbadpirate= new TextureRegion(new Texture("images/deadbadpirate.png"));
+		clue= new TextureRegion(new Texture("images/clue.png"));
 		
 		pirateSprites= new Texture("images/player/piratesprites.png");
 		TextureRegion[][] sprites= TextureRegion.split(pirateSprites, 32, 32);

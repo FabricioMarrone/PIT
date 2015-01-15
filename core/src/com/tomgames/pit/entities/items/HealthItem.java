@@ -15,8 +15,8 @@ public class HealthItem extends Item{
 	}
 
 	@Override
-	public void itemTaked(Player player) {
-		super.itemTaked(player);
+	public void itemTaken(Player player) {
+		super.itemTaken(player);
 		player.addLifePoints(cantHealthPoints);
 	}
 

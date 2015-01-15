@@ -3,6 +3,7 @@ package com.tomgames.pit;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
@@ -11,22 +12,32 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
 import com.tomgames.basic.resources.Assets;
 import com.tomgames.pit.entities.Enemy;
 import com.tomgames.pit.entities.Player;
+import com.tomgames.pit.entities.items.BigTreasure;
+import com.tomgames.pit.entities.items.ClueItem;
 import com.tomgames.pit.entities.items.Item;
+import com.tomgames.pit.entities.items.ValueItem;
 
 public class Island {
 
+	private String islandGameName;
 	private TiledMap tiledMap;
 	private Island neighborhoodIslandN, neighborhoodIslandS, neighborhoodIslandE, neighborhoodIslandW;
 	private int mapTileWidth, mapTileHeight, mapPixelWidth, mapPixelHeight, tileWidth, tileHeight;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private ArrayList<Item> items;
+	private ArrayList<GridPoint2> digZones;
 	private ArrayList<DestructibleBlock> destructibleBlocks;
 	private ArrayList<Enemy> enemies;
 	private int[] layersToRenderBeforePlayer= {TiledMapUtilities.LAYER_SCENE_1, TiledMapUtilities.LAYER_SCENE_2};
-	private int[] layersToRenderAfterPlayer= {TiledMapUtilities.LAYER_SCENE_3};
+	private int[] layersToRenderAfterPlayer= {TiledMapUtilities.LAYER_SCENE_3, TiledMapUtilities.LAYER_SCENE_3a};
+	private float total_secrets, secrets_Found, total_gold, gold_Found;
+	private int total_bigTreasures, bigTreasures_Found;
+	private boolean allBigTreasuresTaken;
 	
 	/**
 	 * 
@@ -36,7 +47,8 @@ public class Island {
 		items= new ArrayList<Item>();
 		destructibleBlocks= new ArrayList<DestructibleBlock>();
 		enemies= new ArrayList<Enemy>();
-		tiledMap = new TmxMapLoader().load("maps/"+islandName);
+		digZones= new ArrayList<GridPoint2>();
+		tiledMap = new TmxMapLoader().load("maps/"+islandName+".tmx");
 		
 		MapProperties prop = tiledMap.getProperties();
 		mapTileWidth = prop.get("width", Integer.class);
@@ -45,12 +57,26 @@ public class Island {
 		tileHeight = prop.get("tileheight", Integer.class);
         mapPixelWidth = mapTileWidth * tileWidth;
         mapPixelHeight = mapTileHeight * tileHeight;
+        islandGameName= prop.get("name", String.class);
         
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         TiledMapUtilities.loadAnimatedTiles(tiledMap);
         items= TiledMapUtilities.getItems(tiledMap);
         destructibleBlocks= TiledMapUtilities.getDestructibleBlocks(tiledMap);
         enemies= TiledMapUtilities.getEnemies(tiledMap);
+        SecretMessages.setMessagesInBottles(islandName, getClueItems());
+        digZones= TiledMapUtilities.getDigZones(tiledMap);
+        
+        allBigTreasuresTaken= false;
+        bigTreasures_Found=0;
+        total_bigTreasures=0;
+		total_secrets=0;
+		total_gold= 0;
+		for(int i=0; i < items.size(); i++){
+			if(items.get(i).getCurrentState() == Item.States.HIDDEN) total_secrets++;
+			if(items.get(i) instanceof ValueItem) total_gold++;
+			if(items.get(i) instanceof BigTreasure) total_bigTreasures++;
+		}
 	}
 	
 	public void renderLayersBeforePlayer(OrthographicCamera cam){
@@ -99,6 +125,14 @@ public class Island {
 		}
 		Assets.fonts.defaultFont.draw(batchGUI, "Items on island: H:"+hiddenCant+" D:"+visibleCant+" T:"+takenCant+" (Tot:"+totalItems+")", 10, 40);
 		
+		Assets.fonts.defaultFont.draw(batchGUI, islandGameName, 350, Gdx.graphics.getHeight()-10);
+		Assets.fonts.defaultFont.draw(batchGUI, "SECRETS - " + (int)((secrets_Found/total_secrets)*100) + "%", Gdx.graphics.getWidth() - 300, 250);
+		Assets.fonts.defaultFont.draw(batchGUI, "GOLD - " + (int)((gold_Found/total_gold)*100) + "%", Gdx.graphics.getWidth() - 300, 230);
+		if(isAllBigTreasuresTaken()) Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES COMPLETED",Gdx.graphics.getWidth() - 300, 210);
+		else Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES " + bigTreasures_Found + "/" + total_bigTreasures,Gdx.graphics.getWidth() - 300, 210);
+		
+		//render items GUI
+		for(int i=0; i < items.size(); i++) items.get(i).renderGUI(batchGUI);
 	}//end render gui
 	
 	/**
@@ -107,8 +141,26 @@ public class Island {
 	 * @param player
 	 */
 	public void update(float delta, Player player){
+		//check for island win condition
+		if(bigTreasures_Found == total_bigTreasures){
+			//THE ISLAND IS COMPLETE (on big treasures at least. Enough to win the game)
+			allBigTreasuresTaken= true;
+		}
+		
 		//check if player collect items
 		checkForItemCollection(player);
+		
+		//update some stats (secrets and gold)
+		int secrets_notFound= 0;
+		gold_Found=0;
+		for(int i=0; i < items.size(); i++){
+			if(items.get(i).getCurrentState() == Item.States.HIDDEN) secrets_notFound++;
+			if(items.get(i) instanceof ValueItem && items.get(i).getCurrentState() == Item.States.TAKEN) gold_Found++;
+		}
+		secrets_Found= total_secrets - secrets_notFound;
+		
+		//check if player collides with enemies
+		CollisionSystem.checkFor_PlayerEnemy_Collision(player, getEnemies());
 		
 		//update all items
 		for(int i=0; i < items.size(); i++) items.get(i).update(delta);
@@ -134,7 +186,9 @@ public class Island {
 				if(items.get(i).getCurrentState()== Item.States.DISCOVERED){
 					if(items.get(i).conditionToTakeItem(player)){
 						items.get(i).setCurrentState(Item.States.TAKEN);
-						items.get(i).itemTaked(player);
+						items.get(i).itemTaken(player);
+						
+						if(items.get(i) instanceof BigTreasure) bigTreasures_Found++;
 					}
 				}
 			}
@@ -146,7 +200,13 @@ public class Island {
 	}
 	
 	public boolean isAbleToDig(int tilePosX, int tilePosY){
-		return TiledMapUtilities.isAbleToDig(getTiledMap(), tilePosX, tilePosY);
+		for(int i= 0; i < digZones.size(); i++){
+			if(digZones.get(i).x == tilePosX && digZones.get(i).y == tilePosY) {
+				return true;
+			}
+		}
+		return false;
+		//return TiledMapUtilities.isAbleToDig(getTiledMap(), tilePosX, tilePosY);
 	}
 	
 	/**
@@ -157,6 +217,15 @@ public class Island {
 	public void digFinished(int tilePosX, int tilePosY){
 		//remove sand
 		TiledMapUtilities.removeSand(getTiledMap(), tilePosX, tilePosY);
+		
+		//remove digZone from array (to not dig again)
+		Iterator<GridPoint2> it= digZones.iterator();
+		while(it.hasNext()){
+			GridPoint2 point= it.next();
+			if(point.x == tilePosX && point.y == tilePosY){
+				it.remove();
+			}
+		}
 		
 		//check if there is something on the tile
 		for(int i=0; i < items.size(); i++){
@@ -215,4 +284,25 @@ public class Island {
 		this.neighborhoodIslandE= islandE;
 		this.neighborhoodIslandW= islandW;
 	}
+	
+	public void addEnemy(Enemy e){
+		enemies.add(e);
+	}
+	
+	public ArrayList<Enemy> getEnemies(){
+		return enemies;
+	}
+	
+	public ArrayList<ClueItem> getClueItems(){
+		ArrayList<ClueItem> clues= new ArrayList<ClueItem>();
+		for(int i=0; i< items.size(); i++){
+			if(items.get(i) instanceof ClueItem) clues.add((ClueItem)items.get(i));
+		}
+		return clues;
+	}
+
+	public boolean isAllBigTreasuresTaken() {
+		return allBigTreasuresTaken;
+	}
+	
 }//end class

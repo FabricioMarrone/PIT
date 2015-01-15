@@ -65,6 +65,11 @@ public class Totem extends Enemy{
 		this.shootType = shootType;
 	}
 
+	@Override
+	public void applyDamage(int amount) {
+		//No damage. U CANT KILL A TOTEM MUAHAHAH
+	}
+
 	
 
 }//end class

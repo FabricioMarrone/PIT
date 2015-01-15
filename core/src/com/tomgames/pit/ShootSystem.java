@@ -69,7 +69,9 @@ public class ShootSystem {
 		for(int i=0; i < badShoots.size(); i++){
 			CollisionSystem.checkIfShootHitsPlayer(badShoots.get(i), player);
 		}
-		//here must be checked hits on enemies
+		for(int i=0; i < goodShoots.size(); i++){
+			CollisionSystem.checkForShootCollision(PIT.instance.gameplay.getCurrentIsland().getEnemies(), goodShoots.get(i));
+		}
 		
 		//check for dead shoots to be re-used
 		//bad ones

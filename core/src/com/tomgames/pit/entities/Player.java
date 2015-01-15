@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.tomgames.basic.resources.Assets;
 import com.tomgames.pit.CollisionSystem;
+import com.tomgames.pit.Message;
 import com.tomgames.pit.PIT;
 import com.tomgames.pit.Rumble;
 import com.tomgames.pit.TiledMapUtilities;
@@ -19,14 +20,17 @@ import com.tomgames.pit.entities.shoots.Shoot;
 public class Player extends Entity{
 	
 	private int score;
-	
+	private float cadenceTime= 0.125f;
+	private float elapsedCadenceTime;
 	private float diggingTime= 1f;
 	private float elapsedDiggingTime;
+	private Message talk;
 	
 	public Player(float posX, float posY) {
 		super(posX, posY);
 		
 		setRunSpeed(175);
+		talk= new Message();
 		setCurrentKeyFrame(Assets.textures.pirateS);
 		
 		//dead "anim"
@@ -110,6 +114,10 @@ public class Player extends Entity{
 		batch.draw(Assets.textures.sword, getPosition().x + v.x, getPosition().y + v.y);
 	}
 	
+	public void renderTalk(SpriteBatch batch){
+		talk.render(batch, getPosition().x - 5, getPosition().y + getZone().height*2);
+	}
+	
 	@Override
 	public void renderGUI(SpriteBatch batchGUI) {
 		Assets.fonts.defaultFont.draw(batchGUI, "State: " + getCurrentState(), 10, Gdx.graphics.getHeight() - 40);
@@ -128,6 +136,9 @@ public class Player extends Entity{
 	public void update(float delta) {	
 		updateCurrentKeyFrameAnimation(delta);
 		
+		//update talk
+		talk.update(delta);
+				
 		//nothing to do if the player is dead :P
 		if(getCurrentState()==States.DEAD) return;
 		
@@ -149,6 +160,7 @@ public class Player extends Entity{
 		case EXPLORING: updateExploring(delta); break;
 		case RAFTING: updateRafting(delta); break;
 		}
+		
 	}//end update
 	
 	private void updateDigging(float delta){
@@ -168,8 +180,11 @@ public class Player extends Entity{
 		}
 		
 		updateMovement(delta);
+		
+		//update attack
 		if(isMeleeAttackOnCourse()) {
 			updateMeleeAttack(delta);
+			//check for hits on destructible blocks AND enemies (bad pirates only, for the moment)
 			CollisionSystem.checkForHit(getSwordArea(), PIT.instance.gameplay.getCurrentIsland().getDestructibleBlocks());
 		}
 		updateAttack(delta);
@@ -222,6 +237,8 @@ public class Player extends Entity{
 	}
 
 	private void updateAttack(float delta){
+		elapsedCadenceTime+= delta;
+		
 		//check for the direction of the attack (if any)
 		boolean pressLeft=false, pressRight=false, pressDown=false, pressUp=false;
 		if(Gdx.input.isKeyJustPressed(Keys.LEFT)) pressLeft= true;
@@ -248,16 +265,22 @@ public class Player extends Entity{
 				}
 			}
 			if(getCurrentAttackMode() == AttackMode.RANGED){
-				//player shoots (if there is enought ammo)
-				if(getAmmo() > 0){
-					subAmmo();
-					Shoot s= PIT.instance.gameplay.shootSystem.getPool().get();
-					s.setType(Shoot.Type.PISTOL_BALL);
-					Vector2 v= Entity.getOffsets(dir, 16);
-					s.setInitialPosition(getPosition().x + v.x, getPosition().y + v.y);
-					s.setDirection(dir);
-					PIT.instance.gameplay.shootSystem.addGoodShoot(s);
+				if(elapsedCadenceTime > cadenceTime){
+					elapsedCadenceTime= 0;
+					//player shoots (if there is enought ammo)
+					if(getAmmo() > 0){
+						subAmmo();
+						Shoot s= PIT.instance.gameplay.shootSystem.getPool().get();
+						s.setType(Shoot.Type.PISTOL_BALL);
+						Vector2 v= Entity.getOffsets(dir, 16);
+						s.setInitialPosition(getPosition().x + v.x, getPosition().y + v.y);
+						s.setDirection(dir);
+						PIT.instance.gameplay.shootSystem.addGoodShoot(s);
+					}else{
+						talk.show("No ammo!", 2.7f);
+					}
 				}
+				
 			}
 		}
 	}
@@ -267,6 +290,7 @@ public class Player extends Entity{
 			setRaft(raft);
 			this.setPosition(raft.getPosition().x, raft.getPosition().y);
 			setCurrentAction(Actions.RAFTING);
+			talk.show("Ai!Ai!", 0.5f);
 		}
 	}
 	
@@ -275,6 +299,7 @@ public class Player extends Entity{
 			getRaft().moveToLastTilePosition();
 			setRaft(null);
 			this.setPosition(getTilePosition().x * 32, getTilePosition().y * 32);
+			talk.show("Glup!", 0.5f);
 		}
 	}
 	
@@ -286,6 +311,10 @@ public class Player extends Entity{
 				elapsedDiggingTime= 0;
 				//move the player "to the tile"
 				setPosition((getTilePosition().x*32), (getTilePosition().y*32));
+				//talk
+				talk.show("Dig dig dig...I love dig!", 1f);
+			}else{
+				talk.show("Cant dig here!", 1f);
 			}
 		}
 	}
@@ -296,6 +325,8 @@ public class Player extends Entity{
 		super.applyDamage(amount);
 		//screen shake! yeey!
 		PIT.instance.gameplay.getCamera().rumble(5f, 0.3f);
+		//pirate talks!
+		talk.show("Arghh!", 0.5f);
 	}
 
 	public int getScore() {
