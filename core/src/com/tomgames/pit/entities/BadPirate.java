@@ -10,6 +10,10 @@ import com.tomgames.basic.resources.Assets;
 import com.tomgames.pit.Message;
 import com.tomgames.pit.PIT;
 import com.tomgames.pit.entities.Entity.States;
+import com.tomgames.pit.entities.items.AmmoItem;
+import com.tomgames.pit.entities.items.HealthItem;
+import com.tomgames.pit.entities.items.Item;
+import com.tomgames.pit.entities.items.ValueItem;
 import com.tomgames.pit.entities.shoots.Shoot;
 
 public class BadPirate extends Enemy{
@@ -88,6 +92,28 @@ public class BadPirate extends Enemy{
 		super.applyDamage(amount);
 		
 		talk.show("Ouch!", 0.5f);
+		
+		if(getCurrentState()==States.DEAD){
+			//Drops an item (not always)
+			if(PIT.instance.random.nextFloat() <= 0.85f){
+				//35-25-40 ammo-health-gold
+				float r= PIT.instance.random.nextFloat();
+				Item i= null;
+				if(r <= 0.35f){
+					i= new AmmoItem(getTilePosition().x, getTilePosition().y);
+					i.setValue(25);
+					((AmmoItem)i).setCantAmmo(5);
+				}else if(r <= 0.6f){
+					i= new HealthItem(getTilePosition().x, getTilePosition().y);
+					i.setValue(25);
+					((HealthItem)i).setCantHealthPoints(10);
+				}else{
+					i= new ValueItem(getTilePosition().x, getTilePosition().y);
+					i.setValue(50);
+				}
+				PIT.instance.gameplay.getCurrentIsland().addDiscoveredItem(i);
+			}
+		}
 	}
 
 	@Override

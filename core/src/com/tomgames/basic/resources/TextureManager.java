@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class TextureManager {
 
 	public TextureRegion testTex, pirate, coin, coin2, ammo, health, health2, raft, raftalone, arrow, shoot, sword, fireball, totem, 
-	badPirate, deadbadpirate, bigTreasure, clue;
+	badPirate, deadbadpirate, bigTreasure, clue, letter, pergamino, 
+	mapclouds, greenPoint, redPoint, map, mapView_m3, mapView_m4, mapView_m7, mapView_m8, mapView_m9;
 	
 	private Texture pirateSprites;
 	public TextureRegion pirateW, pirateE, pirateN, pirateS, pirateSW, pirateSE, pirateNW, pirateNE, dead;
@@ -30,6 +31,18 @@ public class TextureManager {
 		badPirate= new TextureRegion(new Texture("images/badpirate.png"));
 		deadbadpirate= new TextureRegion(new Texture("images/deadbadpirate.png"));
 		clue= new TextureRegion(new Texture("images/clue.png"));
+		pergamino= new TextureRegion(new Texture("images/pergamino.png"));
+		letter= new TextureRegion(new Texture("images/letter.png"));
+		mapclouds= new TextureRegion(new Texture("images/mapclouds.png"));
+		greenPoint= new TextureRegion(new Texture("images/greenPoint.png"));
+		redPoint= new TextureRegion(new Texture("images/redPoint.png"));
+		
+		map= new TextureRegion(new Texture("images/map.png"));
+		mapView_m3=new TextureRegion(new Texture("maps/mapView_m3.png"));
+		mapView_m4=new TextureRegion(new Texture("maps/mapView_m4.png"));
+		mapView_m7=new TextureRegion(new Texture("maps/mapView_m7.png"));
+		mapView_m8=new TextureRegion(new Texture("maps/mapView_m8.png"));
+		mapView_m9=new TextureRegion(new Texture("maps/mapView_m9.png"));
 		
 		pirateSprites= new Texture("images/player/piratesprites.png");
 		TextureRegion[][] sprites= TextureRegion.split(pirateSprites, 32, 32);

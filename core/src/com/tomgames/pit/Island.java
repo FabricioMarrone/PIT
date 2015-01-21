@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -20,11 +21,12 @@ import com.tomgames.pit.entities.Player;
 import com.tomgames.pit.entities.items.BigTreasure;
 import com.tomgames.pit.entities.items.ClueItem;
 import com.tomgames.pit.entities.items.Item;
+import com.tomgames.pit.entities.items.MapItem;
 import com.tomgames.pit.entities.items.ValueItem;
 
 public class Island {
 
-	private String islandGameName;
+	private String islandName, islandGameName;
 	private TiledMap tiledMap;
 	private Island neighborhoodIslandN, neighborhoodIslandS, neighborhoodIslandE, neighborhoodIslandW;
 	private int mapTileWidth, mapTileHeight, mapPixelWidth, mapPixelHeight, tileWidth, tileHeight;
@@ -38,6 +40,8 @@ public class Island {
 	private float total_secrets, secrets_Found, total_gold, gold_Found;
 	private int total_bigTreasures, bigTreasures_Found;
 	private boolean allBigTreasuresTaken;
+	private boolean mapTaken;
+	private TextureRegion mapView;
 	
 	/**
 	 * 
@@ -49,6 +53,8 @@ public class Island {
 		enemies= new ArrayList<Enemy>();
 		digZones= new ArrayList<GridPoint2>();
 		tiledMap = new TmxMapLoader().load("maps/"+islandName+".tmx");
+		
+		this.islandName= islandName;
 		
 		MapProperties prop = tiledMap.getProperties();
 		mapTileWidth = prop.get("width", Integer.class);
@@ -68,6 +74,7 @@ public class Island {
         digZones= TiledMapUtilities.getDigZones(tiledMap);
         
         allBigTreasuresTaken= false;
+        mapTaken= false;
         bigTreasures_Found=0;
         total_bigTreasures=0;
 		total_secrets=0;
@@ -77,6 +84,12 @@ public class Island {
 			if(items.get(i) instanceof ValueItem) total_gold++;
 			if(items.get(i) instanceof BigTreasure) total_bigTreasures++;
 		}
+		
+		if(islandName.compareToIgnoreCase("m3")==0) setMapView(Assets.textures.mapView_m3);
+		if(islandName.compareToIgnoreCase("m4")==0) setMapView(Assets.textures.mapView_m4);
+		if(islandName.compareToIgnoreCase("m7")==0) setMapView(Assets.textures.mapView_m7);
+		if(islandName.compareToIgnoreCase("m8")==0) setMapView(Assets.textures.mapView_m8);
+		if(islandName.compareToIgnoreCase("m9")==0) setMapView(Assets.textures.mapView_m9);
 	}
 	
 	public void renderLayersBeforePlayer(OrthographicCamera cam){
@@ -126,7 +139,8 @@ public class Island {
 		Assets.fonts.defaultFont.draw(batchGUI, "Items on island: H:"+hiddenCant+" D:"+visibleCant+" T:"+takenCant+" (Tot:"+totalItems+")", 10, 40);
 		
 		Assets.fonts.defaultFont.draw(batchGUI, islandGameName, 350, Gdx.graphics.getHeight()-10);
-		Assets.fonts.defaultFont.draw(batchGUI, "SECRETS - " + (int)((secrets_Found/total_secrets)*100) + "%", Gdx.graphics.getWidth() - 300, 250);
+		if(total_secrets==0)Assets.fonts.defaultFont.draw(batchGUI, "SECRETS - 100%", Gdx.graphics.getWidth() - 300, 250);
+		else Assets.fonts.defaultFont.draw(batchGUI, "SECRETS - " + (int)((secrets_Found/total_secrets)*100) + "%", Gdx.graphics.getWidth() - 300, 250);
 		Assets.fonts.defaultFont.draw(batchGUI, "GOLD - " + (int)((gold_Found/total_gold)*100) + "%", Gdx.graphics.getWidth() - 300, 230);
 		if(isAllBigTreasuresTaken()) Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES COMPLETED",Gdx.graphics.getWidth() - 300, 210);
 		else Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES " + bigTreasures_Found + "/" + total_bigTreasures,Gdx.graphics.getWidth() - 300, 210);
@@ -153,9 +167,13 @@ public class Island {
 		//update some stats (secrets and gold)
 		int secrets_notFound= 0;
 		gold_Found=0;
+		total_gold= 0;
 		for(int i=0; i < items.size(); i++){
 			if(items.get(i).getCurrentState() == Item.States.HIDDEN) secrets_notFound++;
-			if(items.get(i) instanceof ValueItem && items.get(i).getCurrentState() == Item.States.TAKEN) gold_Found++;
+			if(items.get(i) instanceof ValueItem){
+				total_gold++;
+				if(items.get(i).getCurrentState() == Item.States.TAKEN) gold_Found++;
+			}
 		}
 		secrets_Found= total_secrets - secrets_notFound;
 		
@@ -177,6 +195,8 @@ public class Island {
 		
 		//update all enemies
 		for(int i=0; i < enemies.size(); i++) enemies.get(i).update(delta);
+		
+		if(isMapTaken()) PIT.instance.gameplay.getMapaMundi().setMapView(getMapView(), islandName);
 		
 	}//end update
 
@@ -304,5 +324,40 @@ public class Island {
 	public boolean isAllBigTreasuresTaken() {
 		return allBigTreasuresTaken;
 	}
+	
+	public void addDiscoveredItem(Item i){
+		i.setCurrentState(Item.States.DISCOVERED);
+		items.add(i);
+	}
+
+	public boolean isMapTaken() {
+		if(mapTaken) return true;
+		
+		for(int i= 0; i < items.size(); i++){
+			if(items.get(i) instanceof MapItem){
+				if(items.get(i).getCurrentState()==Item.States.TAKEN){
+					mapTaken= true;
+					return true;
+				}else{
+					return false;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	public TextureRegion getMapView() {
+		return mapView;
+	}
+
+	public void setMapView(TextureRegion mapView) {
+		this.mapView = mapView;
+	}
+
+	public String getIslandName() {
+		return islandName;
+	}
+	
 	
 }//end class

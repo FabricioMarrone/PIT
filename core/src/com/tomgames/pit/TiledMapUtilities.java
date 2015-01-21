@@ -24,6 +24,7 @@ import com.tomgames.pit.entities.items.BigTreasure;
 import com.tomgames.pit.entities.items.ClueItem;
 import com.tomgames.pit.entities.items.HealthItem;
 import com.tomgames.pit.entities.items.Item;
+import com.tomgames.pit.entities.items.MapItem;
 import com.tomgames.pit.entities.items.ValueItem;
 import com.tomgames.pit.entities.shoots.Shoot;
 
@@ -627,7 +628,7 @@ public class TiledMapUtilities {
 	 * Returns Items of the map (this creates entire object for every "item tile" on the map).
 	 * An "item tile" has the following properties:
 	 * 
-	 * item: string (big/value/ammo/hp/clue)
+	 * item: string (big/value/ammo/hp/clue/map)
 	 * value: int (score to be added)
 	 * hidden: boolean 
 	 * [cant: int (only for ammo and hp)]]
@@ -651,6 +652,13 @@ public class TiledMapUtilities {
             		int value= Integer.parseInt(tile.getProperties().get("value").toString());
             		boolean hidden= false;
             		if(tile.getProperties().get("hidden").toString().compareToIgnoreCase("true")==0) hidden= true;
+            		
+            		if(type.compareToIgnoreCase("map")==0){
+            			item= new MapItem(x, y);
+            			item.setValue(value);
+            			if(hidden) item.setCurrentState(Item.States.HIDDEN);
+            			else item.setCurrentState(Item.States.DISCOVERED);
+            		}
             		
             		if(type.compareToIgnoreCase("big")==0){
             			item= new BigTreasure(x, y);
@@ -700,7 +708,7 @@ public class TiledMapUtilities {
             			if(hidden) item.setCurrentState(Item.States.HIDDEN);
             			else item.setCurrentState(Item.States.DISCOVERED);
             			
-            			//the messsage of the bottle will be added later (the island will do it, randomly)
+            			//the messsage of the bottle will be added later (the island will do it)
             		}
             		
             		if(item != null) items.add(item);

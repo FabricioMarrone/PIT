@@ -1,5 +1,7 @@
 package com.tomgames.pit.entities.items;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tomgames.basic.resources.Assets;
 import com.tomgames.pit.entities.Player;
@@ -8,8 +10,8 @@ public class ClueItem extends Item{
 
 	private String message;
 	private boolean showMessage;
-	private float messageTime= 5f;
-	private float elapsedTime;
+	//private float messageTime= 5f;
+	//private float elapsedTime;
 	
 	public ClueItem(int tilePosX, int tilePosY) {
 		super(tilePosX, tilePosY);
@@ -22,7 +24,11 @@ public class ClueItem extends Item{
 	public void renderGUI(SpriteBatch batchGUI) {
 		super.renderGUI(batchGUI);
 		
-		if(showMessage) Assets.fonts.defaultFont.draw(batchGUI, getMessage(), 150, 300);
+		if(showMessage) {
+			batchGUI.draw(Assets.textures.letter, 100, 50);
+			Assets.fonts.defaultFont.drawMultiLine(batchGUI, getMessage(), 165, 350);
+			Assets.fonts.defaultFont.drawMultiLine(batchGUI, "Press C to close", 190, 120);
+		}
 	}
 
 	
@@ -33,11 +39,12 @@ public class ClueItem extends Item{
 		super.update(delta);
 		
 		if(showMessage){
-			elapsedTime+= delta;
-			if(elapsedTime > messageTime){
-				elapsedTime= 0;
-				showMessage= false;
-			}
+			//elapsedTime+= delta;
+			//if(elapsedTime > messageTime){
+			//	elapsedTime= 0;
+			//	showMessage= false;
+			//}
+			if(Gdx.input.isKeyJustPressed(Keys.C)) showMessage= false;
 		}
 	}
 
@@ -55,4 +62,10 @@ public class ClueItem extends Item{
 		this.message = message;
 	}
 	
+	/**
+	 * This should be used only for re-read messages.
+	 */
+	public void showMessage(){
+		this.showMessage= true;
+	}
 }//end class
