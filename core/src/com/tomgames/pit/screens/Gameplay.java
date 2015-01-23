@@ -105,7 +105,7 @@ public class Gameplay extends ScreenClass{
 		
 		changeToIsland(m4);
 		player= new Player(79 * 32, (99-51) *32);
-		raft= new Raft(81 * 32, (99-51) * 32);
+		raft= new Raft(85 * 32, (99-51) * 32);
 		
 		//raft= new Raft(66 * 32, (99-26) * 32);
 		//player= new Player(29 * 32, (99-21) *32);

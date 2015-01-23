@@ -7,7 +7,7 @@ public class TextureManager {
 
 	public TextureRegion testTex, pirate, coin, coin2, ammo, health, health2, raft, raftalone, arrow, shoot, sword, fireball, totem, 
 	badPirate, deadbadpirate, bigTreasure, clue, letter, pergamino, 
-	mapclouds, greenPoint, redPoint, map, mapView_m3, mapView_m4, mapView_m7, mapView_m8, mapView_m9;
+	mapclouds, greenPoint, yellowPoint, map, mapView_m1, mapView_m2, mapView_m3, mapView_m4, mapView_m5, mapView_m6, mapView_m7, mapView_m8, mapView_m9;
 	
 	private Texture pirateSprites;
 	public TextureRegion pirateW, pirateE, pirateN, pirateS, pirateSW, pirateSE, pirateNW, pirateNE, dead;
@@ -20,11 +20,11 @@ public class TextureManager {
 		coin= new TextureRegion(new Texture("images/coin.png"));
 		coin2= new TextureRegion(new Texture("images/coin2.png"));
 		bigTreasure= new TextureRegion(new Texture("images/bigtreasure.png"));
-		ammo= new TextureRegion(new Texture("images/ammo.png"));
+		ammo= new TextureRegion(new Texture("images/ammo2.png"));
 		health= new TextureRegion(new Texture("images/health.png"));
 		health2= new TextureRegion(new Texture("images/health2.png"));
 		arrow= new TextureRegion(new Texture("images/arrow.png"));
-		shoot= new TextureRegion(new Texture("images/shoot.png"));
+		shoot= new TextureRegion(new Texture("images/shoot2.png"));
 		sword= new TextureRegion(new Texture("images/sword.png"));
 		fireball= new TextureRegion(new Texture("images/fireball.png"));
 		totem= new TextureRegion(new Texture("images/totem.png"));
@@ -35,11 +35,15 @@ public class TextureManager {
 		letter= new TextureRegion(new Texture("images/letter.png"));
 		mapclouds= new TextureRegion(new Texture("images/mapclouds.png"));
 		greenPoint= new TextureRegion(new Texture("images/greenPoint.png"));
-		redPoint= new TextureRegion(new Texture("images/redPoint.png"));
+		yellowPoint= new TextureRegion(new Texture("images/yellowPoint.png"));
 		
 		map= new TextureRegion(new Texture("images/map.png"));
+		mapView_m1=new TextureRegion(new Texture("maps/mapView_m1.png"));
+		mapView_m2=new TextureRegion(new Texture("maps/mapView_m2.png"));
 		mapView_m3=new TextureRegion(new Texture("maps/mapView_m3.png"));
 		mapView_m4=new TextureRegion(new Texture("maps/mapView_m4.png"));
+		mapView_m5=new TextureRegion(new Texture("maps/mapView_m5.png"));
+		mapView_m6=new TextureRegion(new Texture("maps/mapView_m6.png"));
 		mapView_m7=new TextureRegion(new Texture("maps/mapView_m7.png"));
 		mapView_m8=new TextureRegion(new Texture("maps/mapView_m8.png"));
 		mapView_m9=new TextureRegion(new Texture("maps/mapView_m9.png"));

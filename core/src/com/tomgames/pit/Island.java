@@ -85,8 +85,12 @@ public class Island {
 			if(items.get(i) instanceof BigTreasure) total_bigTreasures++;
 		}
 		
+		if(islandName.compareToIgnoreCase("m1")==0) setMapView(Assets.textures.mapView_m1);
+		if(islandName.compareToIgnoreCase("m2")==0) setMapView(Assets.textures.mapView_m2);
 		if(islandName.compareToIgnoreCase("m3")==0) setMapView(Assets.textures.mapView_m3);
 		if(islandName.compareToIgnoreCase("m4")==0) setMapView(Assets.textures.mapView_m4);
+		if(islandName.compareToIgnoreCase("m5")==0) setMapView(Assets.textures.mapView_m5);
+		if(islandName.compareToIgnoreCase("m6")==0) setMapView(Assets.textures.mapView_m6);
 		if(islandName.compareToIgnoreCase("m7")==0) setMapView(Assets.textures.mapView_m7);
 		if(islandName.compareToIgnoreCase("m8")==0) setMapView(Assets.textures.mapView_m8);
 		if(islandName.compareToIgnoreCase("m9")==0) setMapView(Assets.textures.mapView_m9);

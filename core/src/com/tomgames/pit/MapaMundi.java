@@ -33,9 +33,8 @@ public class MapaMundi {
 		Player p= PIT.instance.getPlayer();
 		Raft r= PIT.instance.getRaft();
 		GridPoint2 v= getCurrentIslandOffsets();
+		batchGUI.draw(Assets.textures.yellowPoint, posX + (r.getTilePosition().x * 2) + v.x - 8, posY + (r.getTilePosition().y * 2) + v.y - 8);
 		batchGUI.draw(Assets.textures.greenPoint, posX + (p.getTilePosition().x * 2) + v.x - 8, posY + (p.getTilePosition().y * 2) + v.y - 8);
-		batchGUI.draw(Assets.textures.redPoint, posX + (r.getTilePosition().x * 2) + v.x - 8, posY + (r.getTilePosition().y * 2) + v.y - 8);
-
 	}
 	
 	public void update(float delta){
