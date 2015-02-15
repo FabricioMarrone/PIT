@@ -14,16 +14,27 @@ import com.tomgames.pit.CollisionSystem;
 import com.tomgames.pit.Message;
 import com.tomgames.pit.PIT;
 import com.tomgames.pit.Rumble;
+import com.tomgames.pit.Settings;
 import com.tomgames.pit.TiledMapUtilities;
 import com.tomgames.pit.entities.shoots.Shoot;
 
 public class Player extends Entity{
 	
+	private int lifes= 3;
 	private int score;
+	private final int SCORE_FOR_LIFE= 50000;
+	private int score_for_life_count;
+	
 	private float cadenceTime= 0.125f;
 	private float elapsedCadenceTime;
+	
 	private float diggingTime= 1f;
 	private float elapsedDiggingTime;
+	
+	private float deadTime= 3.5f;
+	private float elapsedDeadTime;
+	private float elapsedDeadTime_forAnim;
+	
 	private Message talk;
 	
 	public Player(float posX, float posY) {
@@ -96,6 +107,12 @@ public class Player extends Entity{
 		
 		if(isMeleeAttackOnCourse()) renderSword(batch);
 		
+		if(getCurrentState() == States.DEAD){
+			if(this.lifes==0){
+				if(elapsedDeadTime_forAnim < deadTime) batch.draw(Assets.textures.angel, (int)getPosition().x, (int)getPosition().y + (elapsedDeadTime_forAnim*150));
+			}
+			else batch.draw(Assets.textures.angel, (int)getPosition().x, (int)getPosition().y + (elapsedDeadTime_forAnim*50));
+		}
 		/*
 		//TODO: test code (it renders contact points)
 		batch.end();
@@ -120,16 +137,21 @@ public class Player extends Entity{
 	
 	@Override
 	public void renderGUI(SpriteBatch batchGUI) {
-		Assets.fonts.defaultFont.draw(batchGUI, "State: " + getCurrentState(), 10, Gdx.graphics.getHeight() - 40);
-		Assets.fonts.defaultFont.draw(batchGUI, "Score: " + getScore(), 350, Gdx.graphics.getHeight() - 40);
-		Assets.fonts.defaultFont.draw(batchGUI, "HP: " + getLifePoints(), 250, Gdx.graphics.getHeight() - 40);
-		Assets.fonts.defaultFont.draw(batchGUI, "Ammo: " + getAmmo(), 250, Gdx.graphics.getHeight() - 60);
-		Assets.fonts.defaultFont.draw(batchGUI, "Current Action: " + getCurrentAction(), 10, Gdx.graphics.getHeight() - 60);
-		Assets.fonts.defaultFont.draw(batchGUI, "Attack Mode: " + getCurrentAttackMode(), 250, Gdx.graphics.getHeight() - 100);
-		Assets.fonts.defaultFont.draw(batchGUI, "Direction: " + getCurrentDirection(), 10, Gdx.graphics.getHeight() - 80);
-		Assets.fonts.defaultFont.draw(batchGUI, "Speed: ("+getVelocity().x+" / "+getVelocity().y+")", 250, Gdx.graphics.getHeight() - 80);
-		Assets.fonts.defaultFont.draw(batchGUI, "Position: ("+getPosition().x+" / "+getPosition().y+")", 10, Gdx.graphics.getHeight() - 100);
-		Assets.fonts.defaultFont.draw(batchGUI, "Tile Position: ("+getTilePosition().x+" / "+getTilePosition().y+")", 10, Gdx.graphics.getHeight() - 120);
+		//Assets.fonts.defaultFont.draw(batchGUI, "State: " + getCurrentState(), 10, Gdx.graphics.getHeight() - 40);
+		batchGUI.draw(Assets.textures.score_gui, -90, Gdx.graphics.getHeight() - 120);
+		Assets.fonts.uiFont.draw(batchGUI, getScore() + "", 40, Gdx.graphics.getHeight() - 90);
+		
+		
+		batchGUI.draw(Assets.textures.playerStats_gui, 300, -60);
+		Assets.fonts.uiFont.draw(batchGUI, getLifePoints()+"", 375, 30);
+		Assets.fonts.uiFont.draw(batchGUI, "x "+getAmmo(), 455, 30);
+		Assets.fonts.uiFont.draw(batchGUI, "x "+lifes, 540, 30);
+		//Assets.fonts.defaultFont.draw(batchGUI, "Current Action: " + getCurrentAction(), 10, Gdx.graphics.getHeight() - 60);
+		//Assets.fonts.defaultFont.draw(batchGUI, "Attack Mode: " + getCurrentAttackMode(), 250, Gdx.graphics.getHeight() - 100);
+		//Assets.fonts.defaultFont.draw(batchGUI, "Direction: " + getCurrentDirection(), 10, Gdx.graphics.getHeight() - 80);
+		//Assets.fonts.defaultFont.draw(batchGUI, "Speed: ("+getVelocity().x+" / "+getVelocity().y+")", 250, Gdx.graphics.getHeight() - 80);
+		//Assets.fonts.defaultFont.draw(batchGUI, "Position: ("+getPosition().x+" / "+getPosition().y+")", 10, Gdx.graphics.getHeight() - 100);
+		//Assets.fonts.defaultFont.draw(batchGUI, "Tile Position: ("+getTilePosition().x+" / "+getTilePosition().y+")", 10, Gdx.graphics.getHeight() - 120);
 	}
 
 	@Override
@@ -140,7 +162,27 @@ public class Player extends Entity{
 		talk.update(delta);
 				
 		//nothing to do if the player is dead :P
-		if(getCurrentState()==States.DEAD) return;
+		if(getCurrentState()==States.DEAD){
+			if(this.lifes == 0){
+				elapsedDeadTime_forAnim+= delta;
+				return;
+			}else{
+				elapsedDeadTime+= delta;
+				if(elapsedDeadTime <= deadTime/2) elapsedDeadTime_forAnim+= delta;
+				else elapsedDeadTime_forAnim-= delta;
+				
+				if(elapsedDeadTime > deadTime){
+					elapsedDeadTime= 0;
+					elapsedDeadTime_forAnim= 0;
+					this.lifes--;
+					setCurrentState(States.ALIVE);
+					setLifePoints(100);
+					if(getAmmo() < 15) setAmmo(15);
+				}else{
+					return;
+				}
+			}
+		}
 		
 		//we check current tile to see if its water or what
 		if(PIT.instance.gameplay.getCurrentIsland().isAWaterTile(getTilePosition().x, getTilePosition().y)){
@@ -276,6 +318,7 @@ public class Player extends Entity{
 						s.setInitialPosition(getPosition().x + v.x, getPosition().y + v.y);
 						s.setDirection(dir);
 						PIT.instance.gameplay.shootSystem.addGoodShoot(s);
+						if(Settings.sounds) Assets.audio.shoot.play();
 					}else{
 						talk.show("No ammo!", 2.7f);
 					}
@@ -327,19 +370,38 @@ public class Player extends Entity{
 		PIT.instance.gameplay.getCamera().rumble(5f, 0.3f);
 		//pirate talks!
 		talk.show("Arghh!", 0.5f);
+		
+		if(Settings.sounds) Assets.audio.shootHit2.play();
 	}
 
 	public int getScore() {
 		return score;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
-	}
+	//public void setScore(int score) {
+	//	this.score = score;
+	//}
 
 	public void addScore(int amount){
 		this.score+= amount;
+		this.score_for_life_count+= amount;
+		if(this.score_for_life_count >= SCORE_FOR_LIFE){
+			this.score_for_life_count= this.score_for_life_count - SCORE_FOR_LIFE;
+			this.lifes++;
+		}
 	}
+
+	@Override
+	public void setCurrentState(States currentState) {
+		super.setCurrentState(currentState);
+		
+		if(currentState == States.DEAD){
+			//Start revive count (if there is lives available)
+			elapsedDeadTime= 0;
+			elapsedDeadTime_forAnim= 0;
+		}
+	}
+	
 	
 	
 }//end class

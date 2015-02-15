@@ -18,21 +18,21 @@ public class SecretMessages {
 	private static String testMap_Msg_1= "\"Surrounded by totems. That will be safe.\"";
 	private static String testMap_Msg_2= "\"I hope nobody will find it.\"";
 	
-	public static String m3_Msg_0= " \"The strongest man is the\none who resists loneliness.\n\n\n Henrik Ibsen";
+	public static String m3_Msg_0= " \"The strongest man is\nthe one who resists\nloneliness.\"\n\n\n Henrik Ibsen";
 	
-	public static String m5_Msg_0= "\"Here lies Sonic, the fast one.\n\nThe Lord of the Rings.\"";
-	public static String m5_Msg_1= "\"Great souls have wills;\nthe weak ones, only desires.\"";
+	public static String m5_Msg_0= "Here lies Sonic,\nThe Lord of the Rings.";
+	public static String m5_Msg_1= "\"Great souls have wills;\nthe weak ones,\nonly desires.\"";
 	
-	public static String m6_Msg_0= "\"I went north.\nNow I face my own death on\nthe Death Islands. What a\nproper name.\n\nIf you wanna live, dont go\nNorth.\n\n\nA dead man.";
+	public static String m6_Msg_0= "In the Northwest you\nwill find the tormented\nby ghosts...";
 	
-	public static String m7_Msg_0= "\"Enjoy life, it's later than\nyou think.\"\n\nFriend.";
-	public static String m7_Msg_1= "If you find truly peace when\nsailing, then you are a real\nsailor.";
+	public static String m7_Msg_0= "\"Enjoy life, it's later\nthan you think.\"\n\nFriend.";
+	public static String m7_Msg_1= "If you find truly peace\nwhen sailing, then you\nare a real sailor.";
 	
-	public static String m8_Msg_0= " \"If the treasure is not here\nto my return, you will\npay it bastard.\"\n\nOne eye pirate.";
+	public static String m8_Msg_0= "My brother always said:\n\"Look behind the trees.\"";
 	public static String m8_Msg_1= "\"Here you can find more\ngold than you though.\"\n\nAnonymous.";
-	public static String m8_Msg_2= "A dead body cant spend gold.\nIts yours then.\n\n\"Look between the three fishes.\"";
+	public static String m8_Msg_2= "A dead body cant spend\ngold. Its yours then.\n\n    \"Look between\n    the three fishes.\"";
 	
-	public static String m9_Msg_0= "The story tells about\na big fortress on the\nthe west. Full of gold\nand secret places.";
+	public static String m9_Msg_0= "The story tells about a big\nfortress on the west.\nFull of gold and secret\nplaces...";
 	
 	public static void setMessagesInBottles(String islandName, ArrayList<ClueItem> clueItems){
 		//m3

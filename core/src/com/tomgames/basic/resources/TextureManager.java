@@ -5,12 +5,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TextureManager {
 
-	public TextureRegion testTex, pirate, coin, coin2, ammo, health, health2, raft, raftalone, arrow, shoot, sword, fireball, totem, 
-	badPirate, deadbadpirate, bigTreasure, clue, letter, pergamino, 
+	public TextureRegion testTex, pirate, coin, coin2, ammo, health, health2, health3, raft, raftalone, arrow, shoot, sword, fireball, 
+	totem, badPirate, deadbadpirate, bigTreasure, clue, letter, letter2, pergamino, 
 	mapclouds, greenPoint, yellowPoint, map, mapView_m1, mapView_m2, mapView_m3, mapView_m4, mapView_m5, mapView_m6, mapView_m7, mapView_m8, mapView_m9;
 	
 	private Texture pirateSprites;
-	public TextureRegion pirateW, pirateE, pirateN, pirateS, pirateSW, pirateSE, pirateNW, pirateNE, dead;
+	public TextureRegion pirateW, pirateE, pirateN, pirateS, pirateSW, pirateSE, pirateNW, pirateNE, dead, angel;
+	
+	public TextureRegion statsGui, islandName_gui, laurels, score_gui, playerStats_gui;
+	public Texture splash, tutorial;
 	
 	protected void loadTextures(){
 		testTex= new TextureRegion(new Texture("images/testTex.png"));
@@ -23,6 +26,7 @@ public class TextureManager {
 		ammo= new TextureRegion(new Texture("images/ammo2.png"));
 		health= new TextureRegion(new Texture("images/health.png"));
 		health2= new TextureRegion(new Texture("images/health2.png"));
+		health3= new TextureRegion(new Texture("images/health3.png"));
 		arrow= new TextureRegion(new Texture("images/arrow.png"));
 		shoot= new TextureRegion(new Texture("images/shoot2.png"));
 		sword= new TextureRegion(new Texture("images/sword.png"));
@@ -33,9 +37,17 @@ public class TextureManager {
 		clue= new TextureRegion(new Texture("images/clue.png"));
 		pergamino= new TextureRegion(new Texture("images/pergamino.png"));
 		letter= new TextureRegion(new Texture("images/letter.png"));
+		letter2= new TextureRegion(new Texture("images/letter2.png"));
 		mapclouds= new TextureRegion(new Texture("images/mapclouds.png"));
 		greenPoint= new TextureRegion(new Texture("images/greenPoint.png"));
 		yellowPoint= new TextureRegion(new Texture("images/yellowPoint.png"));
+		statsGui= new TextureRegion(new Texture("images/stats_gui.png"));
+		islandName_gui= new TextureRegion(new Texture("images/islandName_gui.png"));
+		laurels= new TextureRegion(new Texture("images/laurels.png"));
+		score_gui= new TextureRegion(new Texture("images/score_gui.png"));
+		playerStats_gui= new TextureRegion(new Texture("images/playerStats_gui.png"));
+		splash= new Texture("images/splash.png");
+		tutorial= new Texture("images/tutorial.png");
 		
 		map= new TextureRegion(new Texture("images/map.png"));
 		mapView_m1=new TextureRegion(new Texture("maps/mapView_m1.png"));
@@ -59,6 +71,7 @@ public class TextureManager {
 		pirateNW= sprites[1][2];
 		pirateNE= sprites[1][3];
 		dead= new TextureRegion(new Texture("images/player/dead.png"));
+		angel= new TextureRegion(new Texture("images/player/angel.png"));
 		
 		/*
 		//Cargamos el atlas del player...

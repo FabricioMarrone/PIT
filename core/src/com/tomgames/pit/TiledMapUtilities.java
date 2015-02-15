@@ -699,7 +699,7 @@ public class TiledMapUtilities {
             			((HealthItem)item).setCantHealthPoints(cant);
             			
             			if(cant==10) item.setTexture(Assets.textures.health);
-            			if(cant==25) item.setTexture(Assets.textures.health2);
+            			if(cant==25) item.setTexture(Assets.textures.health3);
             		}
             		
             		if(type.compareToIgnoreCase("clue")==0){

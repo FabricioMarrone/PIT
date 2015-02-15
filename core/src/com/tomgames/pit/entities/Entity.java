@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.tomgames.basic.resources.Assets;
+import com.tomgames.pit.PIT;
 
 public abstract class Entity extends GameObject{
 
@@ -104,6 +105,7 @@ public abstract class Entity extends GameObject{
 		if(lifePoints <= 0){
 			lifePoints= 0;
 			this.setCurrentState(States.DEAD);
+			PIT.instance.getPlayer().addScore(100);
 		}
 	}
 	

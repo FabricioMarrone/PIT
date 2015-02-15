@@ -24,10 +24,13 @@ public class ClueItem extends Item{
 	public void renderGUI(SpriteBatch batchGUI) {
 		super.renderGUI(batchGUI);
 		
+		int renderX= 0;
+		int renderY= 50;
+		
 		if(showMessage) {
-			batchGUI.draw(Assets.textures.letter, 100, 50);
-			Assets.fonts.defaultFont.drawMultiLine(batchGUI, getMessage(), 165, 350);
-			Assets.fonts.defaultFont.drawMultiLine(batchGUI, "Press C to close", 190, 120);
+			batchGUI.draw(Assets.textures.letter, renderX, renderY);
+			Assets.fonts.clueFont.drawMultiLine(batchGUI, getMessage(), renderX+65, renderY+300);
+			Assets.fonts.uiFont.draw(batchGUI, "Press C to close", renderX+90, renderY+70);
 		}
 	}
 

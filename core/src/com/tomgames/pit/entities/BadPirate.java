@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.tomgames.basic.resources.Assets;
 import com.tomgames.pit.Message;
 import com.tomgames.pit.PIT;
+import com.tomgames.pit.Settings;
 import com.tomgames.pit.entities.Entity.States;
 import com.tomgames.pit.entities.items.AmmoItem;
 import com.tomgames.pit.entities.items.HealthItem;
@@ -58,17 +59,19 @@ public class BadPirate extends Enemy{
 		
 		if(getCurrentState()==States.DEAD) return;
 		
-		//if player is near, shoot him!
-		elapsedTime+= delta;
+		//if player is near, shoot him! (but only if he is alive)
 		Player p= PIT.instance.getPlayer();
-		int distX= Math.abs(getTilePosition().x - p.getTilePosition().x);
-		int distY= Math.abs(getTilePosition().y - p.getTilePosition().y);
-		if(distX <= range_attack && distY <= range_attack){
-			if(elapsedTime > shootInteval){
-				Directions dir= Entity.getDirection(getTilePosition().x, getTilePosition().y, p.getTilePosition().x, p.getTilePosition().y);
-				if(dir!=null){
-					elapsedTime= 0;
-					this.shoot(dir);
+		if(p.getCurrentState() == States.ALIVE){
+			elapsedTime+= delta;
+			int distX= Math.abs(getTilePosition().x - p.getTilePosition().x);
+			int distY= Math.abs(getTilePosition().y - p.getTilePosition().y);
+			if(distX <= range_attack && distY <= range_attack){
+				if(elapsedTime > shootInteval){
+					Directions dir= Entity.getDirection(getTilePosition().x, getTilePosition().y, p.getTilePosition().x, p.getTilePosition().y);
+					if(dir!=null){
+						elapsedTime= 0;
+						this.shoot(dir);
+					}
 				}
 			}
 		}
@@ -84,6 +87,7 @@ public class BadPirate extends Enemy{
 		PIT.instance.gameplay.shootSystem.addBadShoot(s);
 		
 		talk.show("Take this!", 0.5f);
+		if(Settings.sounds) Assets.audio.shoot2.play();
 	}
 
 	
@@ -92,6 +96,12 @@ public class BadPirate extends Enemy{
 		super.applyDamage(amount);
 		
 		talk.show("Ouch!", 0.5f);
+		
+		if(Settings.sounds) {
+			if(PIT.instance.getPlayer().getCurrentAttackMode() == Entity.AttackMode.RANGED){
+				Assets.audio.shootHit3.play();
+			}
+		}
 		
 		if(getCurrentState()==States.DEAD){
 			//Drops an item (not always)

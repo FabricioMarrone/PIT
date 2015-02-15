@@ -8,12 +8,14 @@ import com.tomgames.basic.gui.UserInterface;
 import com.tomgames.pit.entities.Player;
 import com.tomgames.pit.entities.Raft;
 import com.tomgames.pit.screens.Gameplay;
+import com.tomgames.pit.screens.SplashScreen;
 import com.tomgames.pit.screens.TestScreen;
 
 public class PIT extends GameClass {
 	
 	/** Screens */
 	public TestScreen testScreen;
+	public SplashScreen splashScreen;
 	public Gameplay gameplay;
 	
 	
@@ -27,11 +29,13 @@ public class PIT extends GameClass {
 		
 		random= new Random();
 		
-		testScreen= new TestScreen();
+		//testScreen= new TestScreen();
+		splashScreen= new SplashScreen();
 		gameplay= new Gameplay();
 		
 		//this.setScreen(testScreen);
-		this.setScreen(gameplay);
+		this.setScreen(splashScreen);
+		//this.setScreen(gameplay);
 	}
 	
 	public Player getPlayer(){

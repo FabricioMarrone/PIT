@@ -3,6 +3,7 @@ package com.tomgames.pit.entities.items;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tomgames.basic.resources.Assets;
+import com.tomgames.pit.Settings;
 import com.tomgames.pit.entities.Player;
 import com.tomgames.pit.entities.items.Item.States;
 
@@ -28,8 +29,7 @@ public class BigTreasure extends Item{
 	public void itemTaken(Player player) {
 		super.itemTaken(player);
 		
-		//Here, somewhere must be noted that a big treasure has been taken.
-		//player.addLifePoints(cantHealthPoints);
+		if(Settings.sounds) Assets.audio.bigTreasure.play();
 	}
 
 }//end class

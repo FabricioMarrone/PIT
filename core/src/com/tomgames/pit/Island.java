@@ -38,7 +38,7 @@ public class Island {
 	private int[] layersToRenderBeforePlayer= {TiledMapUtilities.LAYER_SCENE_1, TiledMapUtilities.LAYER_SCENE_2};
 	private int[] layersToRenderAfterPlayer= {TiledMapUtilities.LAYER_SCENE_3, TiledMapUtilities.LAYER_SCENE_3a};
 	private float total_secrets, secrets_Found, total_gold, gold_Found;
-	private int total_bigTreasures, bigTreasures_Found;
+	private int total_bigTreasures, bigTreasures_Found, total_clues, clues_Found;
 	private boolean allBigTreasuresTaken;
 	private boolean mapTaken;
 	private TextureRegion mapView;
@@ -79,10 +79,12 @@ public class Island {
         total_bigTreasures=0;
 		total_secrets=0;
 		total_gold= 0;
+		total_clues= 0;
 		for(int i=0; i < items.size(); i++){
 			if(items.get(i).getCurrentState() == Item.States.HIDDEN) total_secrets++;
 			if(items.get(i) instanceof ValueItem) total_gold++;
 			if(items.get(i) instanceof BigTreasure) total_bigTreasures++;
+			if(items.get(i) instanceof ClueItem) total_clues++;
 		}
 		
 		if(islandName.compareToIgnoreCase("m1")==0) setMapView(Assets.textures.mapView_m1);
@@ -130,6 +132,7 @@ public class Island {
 	}
 	
 	public void renderGUI(SpriteBatch batchGUI){
+		/*
 		//calculates how many items
 		int totalItems= items.size();
 		int hiddenCant=0;
@@ -141,13 +144,27 @@ public class Island {
 			if(items.get(i).getCurrentState() == Item.States.TAKEN) takenCant++;
 		}
 		Assets.fonts.defaultFont.draw(batchGUI, "Items on island: H:"+hiddenCant+" D:"+visibleCant+" T:"+takenCant+" (Tot:"+totalItems+")", 10, 40);
+		*/
 		
-		Assets.fonts.defaultFont.draw(batchGUI, islandGameName, 350, Gdx.graphics.getHeight()-10);
-		if(total_secrets==0)Assets.fonts.defaultFont.draw(batchGUI, "SECRETS - 100%", Gdx.graphics.getWidth() - 300, 250);
-		else Assets.fonts.defaultFont.draw(batchGUI, "SECRETS - " + (int)((secrets_Found/total_secrets)*100) + "%", Gdx.graphics.getWidth() - 300, 250);
-		Assets.fonts.defaultFont.draw(batchGUI, "GOLD - " + (int)((gold_Found/total_gold)*100) + "%", Gdx.graphics.getWidth() - 300, 230);
-		if(isAllBigTreasuresTaken()) Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES COMPLETED",Gdx.graphics.getWidth() - 300, 210);
-		else Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES " + bigTreasures_Found + "/" + total_bigTreasures,Gdx.graphics.getWidth() - 300, 210);
+		batchGUI.draw(Assets.textures.islandName_gui, (Gdx.graphics.getWidth()-Assets.textures.islandName_gui.getRegionWidth())/2, Gdx.graphics.getHeight() - 50);
+		Assets.fonts.uiFontBig.draw(batchGUI, islandGameName, 380, Gdx.graphics.getHeight()-15);
+		if(isAllBigTreasuresTaken()) batchGUI.draw(Assets.textures.laurels, 300, Gdx.graphics.getHeight() - 59);
+		
+		batchGUI.draw(Assets.textures.statsGui, Gdx.graphics.getWidth() - 280, Gdx.graphics.getHeight() - 162);
+		
+		Assets.fonts.uiFont.draw(batchGUI, this.clues_Found + "/" + this.total_clues, Gdx.graphics.getWidth() - 80, Gdx.graphics.getHeight() - 95);
+		
+		if(total_secrets==0)Assets.fonts.uiFontWhite.draw(batchGUI, "SECRETS 100%", Gdx.graphics.getWidth() - 135, Gdx.graphics.getHeight() - 137);
+		else Assets.fonts.uiFontWhite.draw(batchGUI, " SECRETS " + (int)((secrets_Found/total_secrets)*100) + "%", Gdx.graphics.getWidth() - 135, Gdx.graphics.getHeight() - 137);
+		
+		Assets.fonts.uiFont.draw(batchGUI, (int)((gold_Found/total_gold)*100) + "%", Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 50);
+		
+		//if(isAllBigTreasuresTaken()) Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES COMPLETED",Gdx.graphics.getWidth() - 300, 210);
+		//else Assets.fonts.defaultFont.draw(batchGUI, "BIG TREASURES " + bigTreasures_Found + "/" + total_bigTreasures,Gdx.graphics.getWidth() - 300, 210);
+		Assets.fonts.uiFont.draw(batchGUI, bigTreasures_Found + "/" + total_bigTreasures, Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 95);
+		
+		if(isMapTaken()) Assets.fonts.uiFont.draw(batchGUI, "Yes", Gdx.graphics.getWidth() - 80, Gdx.graphics.getHeight() - 50);
+		else Assets.fonts.uiFont.draw(batchGUI, "No", Gdx.graphics.getWidth() - 80, Gdx.graphics.getHeight() - 50);
 		
 		//render items GUI
 		for(int i=0; i < items.size(); i++) items.get(i).renderGUI(batchGUI);
@@ -172,11 +189,15 @@ public class Island {
 		int secrets_notFound= 0;
 		gold_Found=0;
 		total_gold= 0;
+		clues_Found= 0;
 		for(int i=0; i < items.size(); i++){
 			if(items.get(i).getCurrentState() == Item.States.HIDDEN) secrets_notFound++;
 			if(items.get(i) instanceof ValueItem){
 				total_gold++;
 				if(items.get(i).getCurrentState() == Item.States.TAKEN) gold_Found++;
+			}
+			if(items.get(i) instanceof ClueItem){
+				if(items.get(i).getCurrentState() == Item.States.TAKEN) clues_Found++;
 			}
 		}
 		secrets_Found= total_secrets - secrets_notFound;

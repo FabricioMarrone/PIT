@@ -31,7 +31,7 @@ public class TestScreen extends ScreenClass {
 	
 	public void init(){
 		item= new ClueItem(10, 10);
-		item.setMessage(SecretMessages.m9_Msg_0);
+		item.setMessage(SecretMessages.m8_Msg_0);
 		item.setCurrentState(Item.States.DISCOVERED);
 		
 		item2= new ClueItem(15, 10);

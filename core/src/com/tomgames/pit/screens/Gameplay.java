@@ -30,8 +30,8 @@ import com.tomgames.pit.entities.items.MapItem;
 
 public class Gameplay extends ScreenClass{
 
-	SpriteBatch batch, batchGUI;
-	ShapeRenderer shapeRender;
+	private SpriteBatch batch, batchGUI;
+	private ShapeRenderer shapeRender;
 	private GameCamera camera;
 	
 	private Island currentIsland;
@@ -39,6 +39,7 @@ public class Gameplay extends ScreenClass{
 	
 	private MapaMundi mapaMundi;
 	private boolean showMapaMundi=false;
+	private boolean tutorial;
 	
 	public ShootSystem shootSystem;
 	
@@ -51,7 +52,7 @@ public class Gameplay extends ScreenClass{
 	
 	public Gameplay() {
 		//ESTO DEBE HACERCE EN LOADING SCREEN
-		Assets.loadAllResources();
+		//Assets.loadAllResources();
 		
 		camera= new GameCamera();
 		
@@ -101,19 +102,21 @@ public class Gameplay extends ScreenClass{
 		m9.setNeighborhoodIslands(m6, null, null, m8);
 		
 		//set current island
-		//changeToIsland(m8);
+		changeToIsland(m8);
 		
-		changeToIsland(m4);
-		player= new Player(79 * 32, (99-51) *32);
-		raft= new Raft(85 * 32, (99-51) * 32);
+		//changeToIsland(m4);
+		//player= new Player(79 * 32, (99-51) *32);
+		//raft= new Raft(85 * 32, (99-51) * 32);
 		
-		//raft= new Raft(66 * 32, (99-26) * 32);
-		//player= new Player(29 * 32, (99-21) *32);
+		raft= new Raft(66 * 32, (99-26) * 32);
+		player= new Player(29 * 32, (99-21) *32);
 		player.setLifePoints(100);
 		player.setAmmo(15);
 		player.setCurrentAttackMode(Entity.AttackMode.RANGED);
 
 		camera.follow(player);
+		
+		tutorial= true;
 	}
 	
 	
@@ -127,7 +130,7 @@ public class Gameplay extends ScreenClass{
         shapeRender.setProjectionMatrix(camera.getCombined());
         
         currentIsland.renderLayersBeforePlayer(camera.getOrthographicCamera());
-        CollisionSystem.render(shapeRender);
+        //CollisionSystem.render(shapeRender);
         
 		batch.begin();
 		raft.render(batch, shapeRender);
@@ -144,24 +147,37 @@ public class Gameplay extends ScreenClass{
 		player.renderTalk(batch);
 		batch.end();
 		
-		//render gui
-		batchGUI.begin();
-		Assets.fonts.defaultFont.draw(batchGUI, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight() - 10);
-		Assets.fonts.defaultFont.draw(batchGUI, "Map available: " + isMapAvailable(), Gdx.graphics.getWidth()-300, 300);
-		Assets.fonts.defaultFont.draw(batchGUI, "Show mapa mundi: " +showMapaMundi, Gdx.graphics.getWidth()-300, 320);
-		player.renderGUI(batchGUI);
-		currentIsland.renderGUI(batchGUI);
-		shootSystem.renderInfo(batchGUI);
-		raft.renderGUI(batchGUI);
-		if(showMapaMundi) mapaMundi.render(batchGUI);
-		PIT.instance.gui.render(batchGUI);
-		batchGUI.end();
+		if(tutorial){
+			batchGUI.begin();
+			batchGUI.draw(Assets.textures.tutorial, 60, 50);
+			batchGUI.end();
+		}else{
+			//render gui
+			batchGUI.begin();
+			Assets.fonts.defaultFont.draw(batchGUI, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight() - 10);
+			//Assets.fonts.defaultFont.draw(batchGUI, "Map available: " + isMapAvailable(), Gdx.graphics.getWidth()-300, 300);
+			//Assets.fonts.defaultFont.draw(batchGUI, "Show mapa mundi: " +showMapaMundi, Gdx.graphics.getWidth()-300, 320);
+			player.renderGUI(batchGUI);
+			currentIsland.renderGUI(batchGUI);
+			//shootSystem.renderInfo(batchGUI);
+			//raft.renderGUI(batchGUI);
+			if(showMapaMundi) mapaMundi.render(batchGUI);
+			PIT.instance.gui.render(batchGUI);
+			batchGUI.end();
+		}
 		
 		this.update(PIT.confirmDelta(delta));
 		//this.update(delta);
 	}//end render
 
 	public void update(float delta){
+		if(tutorial){
+			camera.update(delta);
+			
+			if(Gdx.input.isKeyJustPressed(Keys.C)) tutorial= false;
+			else return;
+		}
+		
 		//Check for island change
 		int offset= 2;	//two is minimun value!! (tested with 1 and doesnt work properly)
 		//--Right limit
